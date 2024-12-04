@@ -3,18 +3,21 @@ package com.langdy.lesson.domain
 import com.langdy.global.domain.BaseEntity
 import com.langdy.global.exception.ApplicationException
 import com.langdy.global.exception.ErrorCode
+import com.langdy.teacher.domain.Teacher
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
+import jakarta.persistence.FetchType
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
 
-
 @Entity
 class Lesson(
     courseId: Long?,
-    teacherId: Long?,
+    teacher: Teacher,
     studentId: Long?,
     status: LessonStatus?,
     startAt: LocalDateTime?,
@@ -22,7 +25,9 @@ class Lesson(
 ) : BaseEntity() {
     var courseId: Long = validateCourseId(courseId)
         protected set
-    var teacherId: Long = validateTeacherId(teacherId)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "teacher_id")
+    var teacher: Teacher = teacher
         protected set
     var studentId: Long = validateStudentId(studentId)
         protected set
@@ -40,14 +45,6 @@ class Lesson(
         }
 
         return courseId
-    }
-
-    private fun validateTeacherId(teacherId: Long?): Long {
-        requireNotNull(teacherId) {
-            throw ApplicationException(ErrorCode.EMPTY_TEACHER_ID)
-        }
-
-        return teacherId
     }
 
     private fun validateStudentId(studentId: Long?): Long {
@@ -81,6 +78,8 @@ class Lesson(
 
         return endAt
     }
+
+    fun getTeacherId(): Long = teacher.id
 
     fun cancel(cancelTime: LocalDateTime) {
         checkActiveLesson()

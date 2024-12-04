@@ -5,6 +5,8 @@ import com.langdy.global.exception.ErrorCode
 import com.langdy.lesson.application.command.CancelLessonCommand
 import com.langdy.lesson.application.command.EnrollLessonCommand
 import com.langdy.lesson.domain.Lesson
+import com.langdy.teacher.application.TeacherQueryService
+import com.langdy.teacher.application.query.GetTeacherQuery
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -14,11 +16,13 @@ import kotlin.math.absoluteValue
 @Service
 @Transactional
 class LessonCommandService(
+    private val teacherQueryService: TeacherQueryService,
     private val lessonQueryRepository: LessonQueryRepository,
     private val lessonCommandRepository: LessonCommandRepository,
 ) {
     fun enroll(command: EnrollLessonCommand) {
-        val lesson = command.toEntity()
+        val teacher = teacherQueryService.getTeacher(GetTeacherQuery(command.teacherId))
+        val lesson = command.toEntity(teacher)
 
         checkExistsSameTimeLesson(lesson)
 
@@ -46,7 +50,7 @@ class LessonCommandService(
     private fun checkExistsSameTimeLessonByTeacher(lesson: Lesson) {
         val existsSameTimeLessonByTeacher =
             lessonQueryRepository.existsByTeacherIdAndEndAtGreaterThanEqualAndStartAtLessThanEqual(
-                lesson.teacherId,
+                lesson.getTeacherId(),
                 lesson.endAt,
                 lesson.startAt
             )
