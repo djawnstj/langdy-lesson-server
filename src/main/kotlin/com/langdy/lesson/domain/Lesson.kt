@@ -7,6 +7,9 @@ import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
+import java.util.concurrent.TimeUnit
+
 
 @Entity
 class Lesson(
@@ -77,5 +80,35 @@ class Lesson(
         }
 
         return endAt
+    }
+
+    fun cancel(cancelTime: LocalDateTime) {
+        checkActiveLesson()
+        checkCancellationTime(cancelTime)
+
+        this.status = LessonStatus.CANCELED
+    }
+
+    private fun checkActiveLesson() {
+        check(status.isEnrolled()) {
+            throw ApplicationException(ErrorCode.ALREADY_CANCELED_LESSON)
+        }
+    }
+
+    private fun checkCancellationTime(cancelTime: LocalDateTime) {
+        check(isCancelableTime(cancelTime)) {
+            throw ApplicationException(ErrorCode.INVALID_LESSON_CANCELLATION_TIME)
+        }
+    }
+
+    private fun isCancelableTime(cancelTime: LocalDateTime): Boolean {
+        val secondsDifference = ChronoUnit.SECONDS.between(cancelTime, this.startAt)
+        return secondsDifference > (CANCELLATION_TIME_DIFF)
+    }
+
+    fun isEnrolledStudent(studentId: Long): Boolean = this.studentId == studentId
+
+    companion object {
+        private val CANCELLATION_TIME_DIFF = TimeUnit.HOURS.toSeconds(12)
     }
 }

@@ -23,6 +23,10 @@ enum class ErrorCode(
     EMPTY_LESSON_END_TIME(HttpStatus.BAD_REQUEST, "수업 신청 종료 시간이 없습니다."),
     EXISTS_STUDENT_LESSON_TIME(HttpStatus.BAD_REQUEST, "해당 시간에 이미 예약된 수업이 있습니다."),
     EXISTS_TEACHER_LESSON_TIME(HttpStatus.BAD_REQUEST, "선생님이 다른 수업이 예약되어 있습니다."),
+    LESSON_NOT_FOUND(HttpStatus.NOT_FOUND, "등록된 수업 예약이 없습니다."),
+    ALREADY_CANCELED_LESSON(HttpStatus.BAD_REQUEST, "이미 취소된 수업입니다."),
+    INVALID_LESSON_CANCELLATION_TIME(HttpStatus.BAD_REQUEST, "수업 시작 12시간 이내에는 취소할 수 없습니다."),
+    INVALID_ENROLLED_STUDENT(HttpStatus.BAD_REQUEST, "수업 신청한 본인만 취소할 수 있습니다."),
 
     // AUTH
     INVALID_AUTH(HttpStatus.UNAUTHORIZED, "접근할 수 없는 요청입니다."),
