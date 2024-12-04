@@ -5,7 +5,9 @@ import com.langdy.lesson.fixture.LessonFixture
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.shouldBe
 import io.kotest.matchers.throwable.shouldHaveMessage
+import java.time.LocalDateTime
 
 class LessonTest : BehaviorSpec({
     Given("수업 신청 엔티티를 생성할 때") {
@@ -76,6 +78,37 @@ class LessonTest : BehaviorSpec({
                 shouldThrow<ApplicationException> {
                     Lesson(lessonFixture.courseId, lessonFixture.teacherId, lessonFixture.studentId, lessonFixture.status, lessonFixture.startAt, lessonFixture.endAt)
                 } shouldHaveMessage "수업 신청 종료 시간이 없습니다."
+            }
+        }
+    }
+
+    Given("수업 신청을 취소할 때") {
+        When("이미 취소된 수업이라면") {
+            val lesson = LessonFixture.`취소된 수업 신청`.`엔티티 생성`()
+
+            Then("예외를 던진다.") {
+                shouldThrow<ApplicationException> {
+                    lesson.cancel(LocalDateTime.now())
+                } shouldHaveMessage "이미 취소된 수업입니다."
+            }
+        }
+        When("수업 시작 시간이 12시간 이내인 수업이라면") {
+            val lesson = LessonFixture.`24년 12월 4일 12시 0분 시작 수업 신청`.`엔티티 생성`()
+
+            Then("예외를 던진다.") {
+                shouldThrow<ApplicationException> {
+                    lesson.cancel(LocalDateTime.of(2024, 12, 4, 0, 0, 0))
+                } shouldHaveMessage "수업 시작 12시간 이내에는 취소할 수 없습니다."
+            }
+        }
+
+        When("12시간 이후로 예약된 상태라면") {
+            val lesson = LessonFixture.`24년 12월 4일 12시 0분 시작 수업 신청`.`엔티티 생성`()
+
+            lesson.cancel(LocalDateTime.of(2024, 12, 3, 23, 59, 59))
+
+            Then("수업 상태를 취소로 변경한다.") {
+                lesson.status shouldBe LessonStatus.CANCELED
             }
         }
     }
