@@ -5,6 +5,8 @@ import com.langdy.lesson.application.command.EnrollLessonCommand
 import com.langdy.lesson.domain.Lesson
 import com.langdy.lesson.domain.LessonStatus
 import com.langdy.lesson.presentation.dto.request.EnrollLessonRequest
+import com.langdy.teacher.domain.Teacher
+import com.langdy.teacher.fixture.TeacherFixture
 import java.time.LocalDateTime
 
 enum class LessonFixture(
@@ -28,11 +30,11 @@ enum class LessonFixture(
     `수업 신청 상태 NULL 수업 신청`(1, 1, 1, null, LocalDateTime.of(2024, 12, 1, 15, 0), LocalDateTime.of(2024, 12, 1, 16, 0)),
     `수업 시작 시간 NULL 수업 신청`(1, 1, 1, LessonStatus.ENROLLED, null, LocalDateTime.of(2024, 12, 1, 16, 0)),
     `수업 종료 시간 NULL 수업 신청`(1, 1, 1, LessonStatus.ENROLLED, LocalDateTime.of(2024, 12, 1, 15, 0), null),
-    `수업 신청 1 학습자 시간 중복`(1, 2, 1, LessonStatus.ENROLLED, LocalDateTime.of(2024, 12, 1, 15, 0), LocalDateTime.of(2024, 12, 1, 16, 0)),
+    `수업 신청 1 학습자 시간 중복`(1, 1, 1, LessonStatus.ENROLLED, LocalDateTime.of(2024, 12, 1, 15, 0), LocalDateTime.of(2024, 12, 1, 16, 0)),
     `수업 신청 1 선생님 시간 중복`(1, 1, 2, LessonStatus.ENROLLED, LocalDateTime.of(2024, 12, 1, 15, 0), LocalDateTime.of(2024, 12, 1, 16, 0)),
     ;
 
-    fun `엔티티 생성`(): Lesson = Lesson(courseId, teacherId, studentId, status, startAt, endAt)
+    fun `엔티티 생성`(teacher: Teacher = TeacherFixture.`선생님 1`.`엔티티 생성`()): Lesson = Lesson(courseId, teacher, studentId, status, startAt, endAt)
     fun `수업 신청 COMMAND 생성`(): EnrollLessonCommand = EnrollLessonCommand(courseId, teacherId, studentId!!, startAt, endAt)
     fun `수업 신청 REQUEST 생성`(): EnrollLessonRequest = EnrollLessonRequest(courseId, teacherId, startAt, endAt)
     fun `수업 취소 COMMAND 생성`(): CancelLessonCommand = CancelLessonCommand(courseId!!, studentId!!)

@@ -31,7 +31,7 @@ class TestLessonRepository : LessonCommandRepository, LessonQueryRepository {
         endAt: LocalDateTime
     ): Boolean {
         return lessons.values.any {
-            it.teacherId == teacherId && (startAt in it.startAt..it.endAt || endAt in it. startAt .. it.endAt)
+            it.getTeacherId() == teacherId && (startAt in it.startAt..it.endAt || endAt in it. startAt .. it.endAt)
         }
     }
 

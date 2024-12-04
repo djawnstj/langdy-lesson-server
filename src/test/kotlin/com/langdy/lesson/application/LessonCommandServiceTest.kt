@@ -3,6 +3,9 @@ package com.langdy.lesson.application
 import com.langdy.global.exception.ApplicationException
 import com.langdy.lesson.fake.TestLessonRepository
 import com.langdy.lesson.fixture.LessonFixture
+import com.langdy.teacher.application.TeacherQueryService
+import com.langdy.teacher.fake.TestTeacherRepository
+import com.langdy.teacher.fixture.TeacherFixture
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
@@ -12,16 +15,21 @@ import io.mockk.mockkStatic
 import java.time.LocalDateTime
 
 class LessonCommandServiceTest : BehaviorSpec({
+    val teacherRepository = TestTeacherRepository()
+    val teacherQueryService = TeacherQueryService(teacherRepository)
     val lessonRepository = TestLessonRepository()
 
-    val service = LessonCommandService(lessonRepository, lessonRepository)
+    val service = LessonCommandService(teacherQueryService, lessonRepository, lessonRepository)
 
     afterContainer {
         lessonRepository.init()
+        teacherRepository.init()
     }
 
     Given("수업 신청을 할 때") {
         When("신청한 학습자가 같은 시간에 이미 신청한 수업 내역이 있다면") {
+            teacherRepository.teachers[1] = TeacherFixture.`선생님 1`.`엔티티 생성`()
+
             lessonRepository.save(LessonFixture.`수업 신청 1`.`엔티티 생성`())
 
             Then("예외를 던진다.") {
@@ -32,6 +40,8 @@ class LessonCommandServiceTest : BehaviorSpec({
         }
 
         When("신청한 선생님이 같은 시간에 이미 신청한 수업 내역이 있다면") {
+            teacherRepository.teachers[1] = TeacherFixture.`선생님 1`.`엔티티 생성`()
+
             lessonRepository.save(LessonFixture.`수업 신청 1`.`엔티티 생성`())
 
             Then("예외를 던진다.") {
@@ -42,6 +52,8 @@ class LessonCommandServiceTest : BehaviorSpec({
         }
 
         When("선생님과 학습자 모두 신청 내역이 없다면") {
+            teacherRepository.teachers[1] = TeacherFixture.`선생님 1`.`엔티티 생성`()
+
             Then("수업 신청을 할 수 있다.") {
                 shouldNotThrowAny {
                     service.enroll(LessonFixture.`수업 신청 1 선생님 시간 중복`.`수업 신청 COMMAND 생성`())

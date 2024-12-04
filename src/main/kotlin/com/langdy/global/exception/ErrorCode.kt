@@ -10,7 +10,7 @@ enum class ErrorCode(
     EMPTY_COURSE_ID(HttpStatus.BAD_REQUEST, "수업 ID가 없습니다."),
 
     // TEACHER
-    EMPTY_TEACHER_ID(HttpStatus.BAD_REQUEST, "선생님 ID가 없습니다."),
+    TEACHER_NOT_FOUND(HttpStatus.BAD_REQUEST, "선생님 정보를 찾을 수 없습니다."),
 
     // STUDENT
     EMPTY_STUDENT_ID(HttpStatus.BAD_REQUEST, "학습자 ID가 없습니다."),

@@ -6,6 +6,8 @@ import com.langdy.lesson.presentation.dto.request.EnrollLessonRequest
 import com.langdy.student.fixture.StudentFixture
 import com.langdy.student.infra.StudentRepository
 import com.langdy.support.KotestControllerTestSupport
+import com.langdy.teacher.fixture.TeacherFixture
+import com.langdy.teacher.infra.TeacherRepository
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockkStatic
@@ -19,6 +21,9 @@ import java.time.LocalDateTime
 class LessonControllerTest : KotestControllerTestSupport() {
 
     @Autowired
+    private lateinit var teacherRepository: TeacherRepository
+
+    @Autowired
     private lateinit var studentRepository: StudentRepository
 
     @Autowired
@@ -29,6 +34,8 @@ class LessonControllerTest : KotestControllerTestSupport() {
             When("요청 본문 값이 정상이면") {
                 val student = StudentFixture.`아이폰 학습자 1`.`엔티티 생성`()
                 studentRepository.saveAndFlush(student)
+
+                teacherRepository.save(TeacherFixture.`선생님 1`.`엔티티 생성`())
 
                 val headers = HttpHeaders().apply { set("Authorization", student.name) }
                 val requestBody = LessonFixture.`수업 신청 1`.`수업 신청 REQUEST 생성`()
@@ -52,7 +59,9 @@ class LessonControllerTest : KotestControllerTestSupport() {
                 val student = StudentFixture.`아이폰 학습자 1`.`엔티티 생성`()
                 studentRepository.saveAndFlush(student)
 
-                val lesson = lessonRepository.saveAndFlush(LessonFixture.`수업 신청 1`.`엔티티 생성`())
+                val teacher = teacherRepository.save(TeacherFixture.`선생님 1`.`엔티티 생성`())
+
+                val lesson = lessonRepository.saveAndFlush(LessonFixture.`수업 신청 1`.`엔티티 생성`(teacher))
 
                 mockkStatic(LocalDateTime::class)
                 val fixedTime = LocalDateTime.of(2024, 12, 1, 0, 0)
