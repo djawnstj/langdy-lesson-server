@@ -1,6 +1,5 @@
 package com.langdy.support
 
-import com.langdy.student.infra.StudentRepository
 import io.kotest.core.extensions.Extension
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
@@ -20,9 +19,6 @@ abstract class KotestControllerTestSupport : BehaviorSpec() {
 
     @LocalServerPort
     protected var port: Int = 0
-
-    @Autowired
-    protected lateinit var studentRepository: StudentRepository
 
     @Autowired
     private lateinit var cleanUp: DbCleanUp
