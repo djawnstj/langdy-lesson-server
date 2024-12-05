@@ -22,8 +22,9 @@ class LessonCommandServiceTest : BehaviorSpec({
     val teacherQueryService = TeacherQueryService(teacherRepository)
     val lessonRepository = TestLessonRepository()
     val emailCommandService = TestEmailCommandService()
+    val pushCommandService = TestPushCommandService()
 
-    val service = LessonCommandService(teacherQueryService, lessonRepository, lessonRepository, emailCommandService)
+    val service = LessonCommandService(teacherQueryService, lessonRepository, lessonRepository, emailCommandService, pushCommandService)
 
     afterContainer {
         lessonRepository.init()
@@ -72,6 +73,10 @@ class LessonCommandServiceTest : BehaviorSpec({
 
             Then("선생님에게 수업 예약 이메일을 발송 한다.") {
                 emailCommandService.isMailSent shouldBe true
+            }
+
+            Then("학습자에게 수업 예약 푸시를 발송 한다.") {
+                pushCommandService.isPushed shouldBe true
             }
         }
     }
