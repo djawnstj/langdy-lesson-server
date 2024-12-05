@@ -23,12 +23,16 @@ class LoginUserArgumentResolver(
     }
 
     private fun extractAuthHeader(webRequest: NativeWebRequest): String {
-        val username = webRequest.getHeader("Authorization")
+        val username = webRequest.getHeader(AUTH_HEADER)
 
         requireNotNull(username) {
             throw ApplicationException(ErrorCode.INVALID_AUTH)
         }
 
         return username
+    }
+
+    companion object {
+        private const val AUTH_HEADER = "Authorization"
     }
 }
