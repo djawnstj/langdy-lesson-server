@@ -32,6 +32,7 @@ repositories {
 dependencies {
     // Spring Web
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
 
     // JPA
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
