@@ -30,6 +30,7 @@ enum class ErrorCode(
 
     // AUTH
     INVALID_AUTH(HttpStatus.UNAUTHORIZED, "접근할 수 없는 요청입니다."),
+    UNAUTHORIZED_IP(HttpStatus.UNAUTHORIZED, "올바르지 않은 요청입니다."),
 
     // COMMON
     INTERNAL_SEVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "관리자에게 문의 바랍니다."),
