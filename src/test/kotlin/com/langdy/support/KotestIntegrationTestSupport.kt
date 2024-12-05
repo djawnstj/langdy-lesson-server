@@ -13,11 +13,15 @@ abstract class KotestIntegrationTestSupport : BehaviorSpec() {
     @Autowired
     private lateinit var cleanUp: DbCleanUp
 
+    @Autowired
+    private lateinit var redisCleanUp: RedisCleanUp
+
     init {
         beforeContainer {
             if (it.isWhen()) {
                 clearAllMocks()
                 cleanUp.all()
+                redisCleanUp.all()
             }
         }
     }
