@@ -7,6 +7,8 @@ import com.langdy.global.exception.ErrorCode
 import com.langdy.lesson.application.command.CancelLessonCommand
 import com.langdy.lesson.application.command.EnrollLessonCommand
 import com.langdy.lesson.domain.Lesson
+import com.langdy.push.application.PushCommandService
+import com.langdy.push.application.command.SendPushCommand
 import com.langdy.teacher.application.TeacherQueryService
 import com.langdy.teacher.application.query.GetTeacherQuery
 import com.langdy.teacher.domain.Teacher
@@ -21,6 +23,7 @@ class LessonCommandService(
     private val lessonQueryRepository: LessonQueryRepository,
     private val lessonCommandRepository: LessonCommandRepository,
     private val emailCommandService: EmailCommandService,
+    private val pushCommandService: PushCommandService,
 ) {
     fun enroll(command: EnrollLessonCommand) {
         val teacher = teacherQueryService.getTeacher(GetTeacherQuery(command.teacherId))
@@ -31,6 +34,7 @@ class LessonCommandService(
         lessonCommandRepository.save(lesson)
 
         sendEnrolledEmail(teacher)
+        sendEnrolledPush()
     }
 
     private fun checkExistsSameTimeLesson(lesson: Lesson) {
@@ -68,6 +72,10 @@ class LessonCommandService(
         emailCommandService.sendEmail(
             SendEmailCommand("${teacher.name} 선생님, 새로운 수업이 예약되었습니다.", "<html>" /* 적절한 이메일 폼 html 생성 */)
         )
+    }
+
+    private fun sendEnrolledPush() {
+        pushCommandService.sendPush(SendPushCommand("수업 신청이 완료되었습니다.", "약속한 시간에 수업을 진행하세요."))
     }
 
     fun cancel(command: CancelLessonCommand) {
