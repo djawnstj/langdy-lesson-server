@@ -1,14 +1,17 @@
 package com.langdy.lesson.application
 
+import com.langdy.email.fake.TestEmailCommandService
 import com.langdy.global.exception.ApplicationException
 import com.langdy.lesson.fake.TestLessonRepository
 import com.langdy.lesson.fixture.LessonFixture
+import com.langdy.push.fake.TestPushCommandService
 import com.langdy.teacher.application.TeacherQueryService
 import com.langdy.teacher.fake.TestTeacherRepository
 import com.langdy.teacher.fixture.TeacherFixture
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.shouldBe
 import io.kotest.matchers.throwable.shouldHaveMessage
 import io.mockk.every
 import io.mockk.mockkStatic
@@ -18,8 +21,9 @@ class LessonCommandServiceTest : BehaviorSpec({
     val teacherRepository = TestTeacherRepository()
     val teacherQueryService = TeacherQueryService(teacherRepository)
     val lessonRepository = TestLessonRepository()
+    val emailCommandService = TestEmailCommandService()
 
-    val service = LessonCommandService(teacherQueryService, lessonRepository, lessonRepository)
+    val service = LessonCommandService(teacherQueryService, lessonRepository, lessonRepository, emailCommandService)
 
     afterContainer {
         lessonRepository.init()
@@ -58,6 +62,16 @@ class LessonCommandServiceTest : BehaviorSpec({
                 shouldNotThrowAny {
                     service.enroll(LessonFixture.`수업 신청 1 선생님 시간 중복`.`수업 신청 COMMAND 생성`())
                 }
+            }
+        }
+
+        When("성공적으로 수업 신청이 되면") {
+            teacherRepository.teachers[1] = TeacherFixture.`선생님 1`.`엔티티 생성`()
+
+            service.enroll(LessonFixture.`수업 신청 1 선생님 시간 중복`.`수업 신청 COMMAND 생성`())
+
+            Then("선생님에게 수업 예약 이메일을 발송 한다.") {
+                emailCommandService.isMailSent shouldBe true
             }
         }
     }
